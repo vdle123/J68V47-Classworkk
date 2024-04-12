@@ -1,6 +1,8 @@
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class Calculator {
 
@@ -17,10 +19,15 @@ public class Calculator {
 
         textField = new JTextField();
         textField.setEditable(false);
+        textField.setBackground(new Color(39,39,39));
+        textField.setForeground(Color.WHITE);
+        textField.setFont(new Font("Verdana", Font.PLAIN, 20));
+        textField.setFocusable(false);
+        textField.setBorder(null);
         frame.add(textField, BorderLayout.NORTH);
 
         JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(5, 4));
+        buttonPanel.setLayout(new GridLayout(5, 4, 1, 1));
 
         String[][] buttonLabels = {
                 {"%", "CE", "del", "/"},
@@ -29,15 +36,34 @@ public class Calculator {
                 {"1", "2", "3", "+"},
                 {"0", ".", "+/-", "="}
         };
-
         for (String[] row : buttonLabels) {
             for (String label : row) {
                 JButton button = new JButton(label);
+                button.setFont(new Font("Verdana",Font.BOLD,17));
+                button.setForeground(Color.WHITE);
+                button.setBackground(Color.GRAY);
+                Border originalBorder = BorderFactory.createLineBorder(Color.DARK_GRAY, 2);;
+                button.setBorder(originalBorder);
+                Border hoverBorder = BorderFactory.createLineBorder(Color.LIGHT_GRAY, 2); // Customize as per your preference
+
+                // Add a MouseListener to detect mouse enter and exit events
+                button.addMouseListener(new java.awt.event.MouseAdapter() {
+                    public void mouseEntered(java.awt.event.MouseEvent evt) {
+                        // Change border on mouse enter
+                        button.setBorder(hoverBorder);
+                    }
+                    public void mouseExited(java.awt.event.MouseEvent evt) {
+                        // Revert border on mouse exit
+                        button.setBorder(originalBorder);
+                    }
+                });
                 button.addActionListener(new ButtonClickListener());
+                button.setFocusPainted(false);
                 buttonPanel.add(button);
             }
         }
-
+        buttonPanel.setBackground(Color.DARK_GRAY);
+        frame.getContentPane().setBackground(Color.BLACK);
         frame.add(buttonPanel, BorderLayout.CENTER);
         frame.setVisible(true);
     }
@@ -51,7 +77,14 @@ public class Calculator {
                     try {
                         String expression = textField.getText();
                         double result = evaluateExpression(expression);
-                        textField.setText(Double.toString(result));
+                        if (result == (long) result) {
+                            // If its a whole number, display without decimals
+                            textField.setText(String.format("%d", (long) result));
+                        } else {
+                            // If its not a whole number, display it with decimal places
+                            textField.setText(Double.toString(result));
+                        }
+                        //textField.setText(Double.toString(result));
                         clearFlag = true;
                     } catch (NumberFormatException | ArithmeticException ex) {
                         textField.setText("Error");
