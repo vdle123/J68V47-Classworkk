@@ -2,7 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class NaujasSudukas implements ActionListener {
+public class PrabandytCalc implements ActionListener {
 
     JFrame frame;
     JTextField textField;
@@ -17,7 +17,7 @@ public class NaujasSudukas implements ActionListener {
     double num1 = 0, num2 = 0, result = 0;
     char operator;
 
-    NaujasSudukas() {
+    PrabandytCalc() {
 
         frame = new JFrame("Calculator");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -97,7 +97,7 @@ public class NaujasSudukas implements ActionListener {
 
     public static void main(String[] args) {
 
-        NaujasSudukas calc = new NaujasSudukas();
+        PrabandytCalc calc = new PrabandytCalc();
     }
 
     @Override
