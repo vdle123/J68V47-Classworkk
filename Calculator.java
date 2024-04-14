@@ -42,7 +42,7 @@ public class Calculator {
                 button.setFont(new Font("Verdana",Font.BOLD,17));
                 button.setForeground(Color.WHITE);
                 button.setBackground(Color.GRAY);
-                Border originalBorder = BorderFactory.createLineBorder(Color.DARK_GRAY, 2);;
+                Border originalBorder = BorderFactory.createLineBorder(Color.DARK_GRAY, 2);
                 button.setBorder(originalBorder);
                 Border hoverBorder = BorderFactory.createLineBorder(Color.LIGHT_GRAY, 2); // Customize as per your preference
 
@@ -169,9 +169,17 @@ class CalculatorEngine {
             double parseTerm() {
                 double x = parseFactor();
                 for (; ; ) {
-                    if (eat('*')) x *= parseFactor();
-                    else if (eat('/')) x /= parseFactor();
-                    else return x;
+                    if(eat('*')) {
+                        x *= parseFactor();
+                    } else if (eat('/')) {
+                        double divisor = parseFactor();
+                        if (divisor == 0) {
+                            throw new ArithmeticException("Division by zero");
+                        }
+                        x /= divisor;
+                    } else {
+                        return x;
+                    }
                 }
             }
 
