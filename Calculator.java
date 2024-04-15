@@ -27,14 +27,15 @@ public class Calculator {
         frame.add(textField, BorderLayout.NORTH);
 
         JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(5, 4, 1, 1));
+        buttonPanel.setLayout(new GridLayout(6, 4, 1, 1));
 
         String[][] buttonLabels = {
                 {"%", "CE", "del", "/"},
                 {"7", "8", "9", "*"},
                 {"4", "5", "6", "-"},
                 {"1", "2", "3", "+"},
-                {"0", ".", "+/-", "="}
+                {"0", ".", "+/-", "="},
+                {"(", ")", "^"}
         };
         for (String[] row : buttonLabels) {
             for (String label : row) {
@@ -78,10 +79,10 @@ public class Calculator {
                         String expression = textField.getText();
                         double result = evaluateExpression(expression);
                         if (result == (long) result) {
-                            // If its a whole number, display without decimals
+                            // If it's a whole number, display without decimals
                             textField.setText(String.format("%d", (long) result));
                         } else {
-                            // If its not a whole number, display it with decimal places
+                            // If it's not a whole number, display it with decimal places
                             textField.setText(Double.toString(result));
                         }
                         //textField.setText(Double.toString(result));
