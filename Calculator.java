@@ -9,8 +9,8 @@ import java.util.Arrays;
 import java.awt.Robot;
 
 public class Calculator {
-    static Color darker_gray = new Color(100,100,100);
-    static Color light_blue = new Color(123,159,207);
+    static Color darker_gray = new Color(100, 100, 100);
+    static Color light_blue = new Color(123, 159, 207);
     private JFrame frame;
     private JTextField textField;
     private JPanel buttonPanel;
@@ -31,10 +31,10 @@ public class Calculator {
         textField.setEditable(false);
         textField.setBackground(new Color(39, 39, 39));
         textField.setForeground(Color.WHITE);
-        textField.setFont(new Font("Verdana", Font.PLAIN, (frame.getHeight()+frame.getWidth())/30));
+        textField.setFont(new Font("Verdana", Font.PLAIN, (frame.getHeight() + frame.getWidth()) / 30));
         textField.setFocusable(false);
         textField.setBorder(null);
-        textField.setPreferredSize(new Dimension(frame.getWidth(),frame.getHeight()/5));
+        textField.setPreferredSize(new Dimension(frame.getWidth(), frame.getHeight() / 5));
         frame.add(textField, BorderLayout.NORTH);
 
         try { //Gets image from url & places it on icons
@@ -51,10 +51,10 @@ public class Calculator {
         String[][] buttonLabels = {
                 {"(", ")", "^", "!", "abs", "round"},
                 {"Func1", "Func2", "%", "CE", "del", "/"},
-                {"e", "√","7", "8", "9", "*"},
-                {"π", "mean","4", "5", "6", "-"},
-                {"sin", "cos","1", "2", "3", "+"},
-                {"tan", ",","0", ".", "+/-", "="}
+                {"e", "√", "7", "8", "9", "*"},
+                {"π", "mean", "4", "5", "6", "-"},
+                {"sin", "cos", "1", "2", "3", "+"},
+                {"tan", ",", "0", ".", "+/-", "="}
 
 
         };
@@ -62,7 +62,7 @@ public class Calculator {
         for (String[] row : buttonLabels) {
             for (String label : row) {
                 JButton button = new JButton(label);
-                button.setFont(new Font("Verdana", Font.BOLD, (frame.getHeight()+frame.getWidth())/60));
+                button.setFont(new Font("Verdana", Font.BOLD, (frame.getHeight() + frame.getWidth()) / 60));
                 button.setForeground(Color.WHITE);
                 button.setBackground(Color.GRAY);
                 Border originalBorder = BorderFactory.createLineBorder(Color.DARK_GRAY, 2);
@@ -83,10 +83,10 @@ public class Calculator {
                 });
                 button.addActionListener(new ButtonClickListener());
                 button.setFocusPainted(false);
-                if(label.equals("=")){
+                if (label.equals("=")) {
                     button.setBackground(light_blue);
                 }
-                if(Arrays.asList(darkerButtons).contains(label)) {
+                if (Arrays.asList(darkerButtons).contains(label)) {
                     button.setBackground(darker_gray); // Set background color to blue
                 }
                 buttonPanel.add(button);
@@ -101,10 +101,10 @@ public class Calculator {
             public void componentResized(ComponentEvent e) { //makes changes if the window has been resized
 
                 textField.setPreferredSize(new Dimension(frame.getWidth(), frame.getHeight() / 5));
-                textField.setFont(new Font("Verdana", Font.PLAIN, (frame.getHeight()+frame.getWidth())/30));
-                double ratio = (double) frame.getSize().height /(double)frame.getWidth();
-                if(ratio>1.5){
-                    int height = (int) (frame.getWidth()*1.5);
+                textField.setFont(new Font("Verdana", Font.PLAIN, (frame.getHeight() + frame.getWidth()) / 30));
+                double ratio = (double) frame.getSize().height / (double) frame.getWidth();
+                if (ratio > 1.5) {
+                    int height = (int) (frame.getWidth() * 1.5);
                     frame.setSize(frame.getWidth(), height);
                     try {
                         Robot robot = new Robot();
@@ -135,12 +135,11 @@ public class Calculator {
 
             if (buttonText.equals("Func2")) {
                 //buttonPanel.setLayout(new GridLayout(6, 6, 1, 1));
-                replaceButtonLabels(new String[]{"(", ")", "^", "!", "abs", "round", "Func1", "Func2","%","CE","del","/","asin", "acos","7","8","9","*","atan","stdevp", "4","5","6","-","nPr", "nCr","1","2","3","+","log","ln","0",".","+/-","="});
+                replaceButtonLabels(new String[]{"(", ")", "^", "!", "abs", "round", "Func1", "Func2", "%", "CE", "del", "/", "asin", "acos", "7", "8", "9", "*", "atan", "stdevp", "4", "5", "6", "-", "nPr", "nCr", "1", "2", "3", "+", "log", "ln", "0", ".", "+/-", "="});
             } else if (buttonText.equals("Func1")) {
                 //buttonPanel.setLayout(new GridLayout(5, 6, 1, 1));
-                replaceButtonLabels(new String[]{"(", ")", "^", "!", "abs", "round", "Func1", "Func2","%","CE","del","/","e", "√","7","8","9","*","π","mean", "4","5","6","-","sin", "cos","1","2","3","+","tan",",","0",".","+/-","="});
-            }
-            else {
+                replaceButtonLabels(new String[]{"(", ")", "^", "!", "abs", "round", "Func1", "Func2", "%", "CE", "del", "/", "e", "√", "7", "8", "9", "*", "π", "mean", "4", "5", "6", "-", "sin", "cos", "1", "2", "3", "+", "tan", ",", "0", ".", "+/-", "="});
+            } else {
                 String command = e.getActionCommand();
                 switch (command) {
                     case "=":
@@ -348,6 +347,12 @@ class CalculatorEngine {
                         x = Math.toRadians(parseExpression());
                         x = Math.sin(x);
                         eat(')');
+                    } else if (pos + 5 < expression.length() && expression.startsWith("stdevp", pos)) {
+                        pos += 5;
+                        eat('s');
+                        eat('(');
+
+                        eat(')');
                     }
                 } else if (ch == 'c') {
                     if (pos + 2 < expression.length() && expression.startsWith("cos", pos)) {
@@ -381,8 +386,45 @@ class CalculatorEngine {
                         x = Math.log1p(parseExpression());
                         eat(')');
                     }
-                }
-                else {
+                } else if (ch == 'm') {
+                    if (pos + 3 < expression.length() && expression.startsWith("mean", pos)) {
+                        pos += 3;
+                        eat('m');
+                        eat('(');
+                        double sum = 0;
+                        int count = 0;
+                        for (; ; ) {
+                            double num = parseExpression();
+                            sum += num;
+                            count++;
+                            if (eat(',')) continue;
+                            if (ch == ')') break;
+                            else throw new RuntimeException("Unexpected: " + (char) ch);
+                        }
+                        eat(')');
+                        if (count == 0)
+                            throw new ArithmeticException("Mean is not defined for an empty list of numbers");
+                        return sum / count;
+                    }
+                } else if (ch == 'n') {
+                    if (pos + 2 < expression.length() && (expression.startsWith("nPr", pos) || expression.startsWith("nCr", pos))) {
+                        String type = expression.substring(pos, pos + 3);
+                        pos += 2;
+                        eat('n');
+                        eat('(');
+                        double n = parseExpression();
+                        eat(',');
+                        double r = parseExpression();
+                        eat(')');
+                        if (r < 0 || r > n)
+                            throw new IllegalArgumentException("Invalid input. n and r must be non-negative, and r must be less than or equal to n.");
+                        if (type.equals("nPr")) {
+                            return factorial((int) n) / factorial((int) (n - r));
+                        } else if (type.equals("nCr")) {
+                            return factorial((int) n) / (factorial((int) r) * factorial((int) (n - r)));
+                        }
+                    }
+                } else {
                     throw new RuntimeException("Unexpected: " + (char) ch);
                 }
 
