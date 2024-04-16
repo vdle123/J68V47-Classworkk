@@ -1,55 +1,74 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Arrays;
 
 public class Calculator {
-
+    static Color darker_gray = new Color(100,100,100);
+    static Color light_blue = new Color(123,159,207);
     private JFrame frame;
     private JTextField textField;
+    private JPanel buttonPanel;
 
     private boolean clearFlag = false; // Flag to determine if the text field should be cleared after pressing CE
 
     public Calculator() {
+
+
         frame = new JFrame("Calculator");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(300, 400);
+        frame.setSize(500, 600);
+        frame.setMinimumSize(new Dimension(500, 600));
         frame.setLayout(new BorderLayout());
+
 
         textField = new JTextField();
         textField.setEditable(false);
         textField.setBackground(new Color(39, 39, 39));
         textField.setForeground(Color.WHITE);
-        textField.setFont(new Font("Verdana", Font.PLAIN, 20));
+        textField.setFont(new Font("Verdana", Font.PLAIN, (frame.getHeight()+frame.getWidth())/30));
         textField.setFocusable(false);
         textField.setBorder(null);
+        textField.setPreferredSize(new Dimension(frame.getWidth(),frame.getHeight()/5));
         frame.add(textField, BorderLayout.NORTH);
 
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(9, 4, 1, 1));
+        try { //Gets image from url & places it on icons
+            URL imageUrl = new URL("https://imgur.com/fVXag8E.jpg");
+            Image image = ImageIO.read(imageUrl);
+            frame.setIconImage(image);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        buttonPanel = new JPanel();
+        buttonPanel.setLayout(new GridLayout(5, 6, 1, 1));
 
         String[][] buttonLabels = { //PATAISYK UI $$$
-                {"%", "CE", "del", "/"},
-                {"7", "8", "9", "*"},
-                {"4", "5", "6", "-"},
-                {"1", "2", "3", "+"},
-                {"0", ".", "+/-", "="},
-                {"(", ")", "^", "abs"},
-                {"round", "e", "π", "√"},
-                {"!", "sin", "cos", "tan"},
-                {"mean", "stdevp", "atan", "acos"},
-                {"asin", "log", ",", "ln"}
+                {"Func1", "Func2", "%", "CE", "del", "/"},
+                {"(", ")","7", "8", "9", "*"},
+                {"^", "abs","4", "5", "6", "-"},
+                {"rnd", "e","1", "2", "3", "+"},
+                {"π", "√","0", ".", "+/-", "="}
+
+
         };
+        String[] darkerbuttons = {"Func1", "Func2", "%", "CE", "del", "/", "*", "-", "+"};
         for (String[] row : buttonLabels) {
             for (String label : row) {
                 JButton button = new JButton(label);
-                button.setFont(new Font("Verdana", Font.BOLD, 17));
+                button.setFont(new Font("Verdana", Font.BOLD, (frame.getHeight()+frame.getWidth())/60));
                 button.setForeground(Color.WHITE);
                 button.setBackground(Color.GRAY);
                 Border originalBorder = BorderFactory.createLineBorder(Color.DARK_GRAY, 2);
                 button.setBorder(originalBorder);
-                Border hoverBorder = BorderFactory.createLineBorder(Color.LIGHT_GRAY, 2); // Customize as per your preference
+                Border hoverBorder = BorderFactory.createLineBorder(Color.LIGHT_GRAY, 2);
 
                 // Add a MouseListener to detect mouse enter and exit events
                 button.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -65,76 +84,133 @@ public class Calculator {
                 });
                 button.addActionListener(new ButtonClickListener());
                 button.setFocusPainted(false);
+                if(label.equals("=")){
+                    button.setBackground(light_blue);
+                }
+                if(Arrays.asList(darkerbuttons).contains(label)) {
+                    button.setBackground(darker_gray); // Set background color to blue
+                }
                 buttonPanel.add(button);
             }
         }
         buttonPanel.setBackground(Color.DARK_GRAY);
         frame.getContentPane().setBackground(Color.BLACK);
         frame.add(buttonPanel, BorderLayout.CENTER);
+        frame.setLocationRelativeTo(null); //start program in the middle of the screen
         frame.setVisible(true);
+        frame.addComponentListener(new ComponentAdapter() {
+            public void componentResized(ComponentEvent e) { //makes changes if the window has been resized
+
+                textField.setPreferredSize(new Dimension(frame.getWidth(), frame.getHeight() / 5));
+                textField.setFont(new Font("Verdana", Font.PLAIN, (frame.getHeight()+frame.getWidth())/30));
+                double ratio = (double) frame.getSize().height /(double)frame.getWidth();
+                System.out.print("W: "+  frame.getWidth() + "H: "+ frame.getHeight()+"ratio "+ratio+ "\n");
+                if(ratio>1.5){
+                    int height = (int) (frame.getWidth()*1.5);
+                    frame.setSize(frame.getWidth(), height);
+                }
+                // Calculate the new font size based on the frame's width and height
+                int newFontSize = (frame.getHeight() + frame.getWidth()) / 60;
+
+                // Loop through each button in the button panel and update its font size
+                for (Component component : buttonPanel.getComponents()) {
+                    if (component instanceof JButton) {
+                        JButton button = (JButton) component;
+                        button.setFont(new Font("Verdana", Font.BOLD, newFontSize));
+                    }
+                }
+            }
+        });
     }
+
 
     private class ButtonClickListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            String command = e.getActionCommand();
-            switch (command) {
-                case "=" -> {
-                    // Evaluate expression
-                    try {
-                        String expression = textField.getText();
-                        double result = evaluateExpression(expression);
-                        if (result == (long) result) {
-                            // If it's a whole number, display without decimals
-                            textField.setText(String.format("%d", (long) result));
-                        } else {
-                            // If it's not a whole number, display it with decimal places
-                            textField.setText(Double.toString(result));
+            JButton clickedButton = (JButton) e.getSource();
+            String buttonText = clickedButton.getText();
+
+            if (buttonText.equals("Func2")) {
+                replaceButtonLabels(new String[]{"Func1", "Func2", "%", "CE", "del", "/", "!", "sin","7","8","9","*","cos", "tan","4","5","6","-","mean","stdevp", "1","2","3","+","atan", "acos"});
+            } else if (buttonText.equals("Func1")) {
+                replaceButtonLabels(new String[]{"Func1", "Func2", "%", "CE", "del", "/", "(", ")","7","8","9","*","^","abs","4","5","6","-","rnd","e", "1","2","3","+","π", "√"});
+            }
+            else {
+                String command = e.getActionCommand();
+                switch (command) {
+                    case "=":
+                        try {
+                            String expression = textField.getText();
+                            double result = evaluateExpression(expression);
+                            if (result == (long) result) {
+                                textField.setText(String.format("%d", (long) result));
+                            } else {
+                                textField.setText(Double.toString(result));
+                            }
+                            clearFlag = true;
+                        } catch (NumberFormatException | ArithmeticException ex) {
+                            textField.setText("Error");
                         }
-                        //textField.setText(Double.toString(result));
-                        clearFlag = true;
-                    } catch (NumberFormatException | ArithmeticException ex) {
-                        textField.setText("Error");
-                    }
-                }
-                case "CE" -> textField.setText("");
-                case "del" -> {
-                    String text = textField.getText();
-                    if (!text.isEmpty()) {
-                        textField.setText(text.substring(0, text.length() - 1));
-                    }
-                }
-                case "%" -> {
-                    try {
-                        String expression = textField.getText();
-                        double result = evaluatePercentage(expression);
-                        textField.setText(Double.toString(result));
-                        clearFlag = true;
-                    } catch (NumberFormatException | ArithmeticException ex) {
-                        textField.setText("Error");
-                    }
-                }
-                case "+/-" -> {
-                    //perdaug darbo del tokio sudo (poto padarysiu muset)
-                }
-                default -> {
-                    if (clearFlag) {
+                        break;
+                    case "CE":
                         textField.setText("");
-                        clearFlag = false;
-                    }
-                    textField.setText(textField.getText() + command);
+                        break;
+                    case "del":
+                        String text = textField.getText();
+                        if (!text.isEmpty()) {
+                            textField.setText(text.substring(0, text.length() - 1));
+                        }
+                        break;
+                    case "%":
+                        try {
+                            String expression = textField.getText();
+                            double result = evaluatePercentage(expression);
+                            textField.setText(Double.toString(result));
+                            clearFlag = true;
+                        } catch (NumberFormatException | ArithmeticException ex) {
+                            textField.setText("Error");
+                        }
+                        break;
+                    case "+/-":
+                        //perdaug darbo del tokio sudo (poto padarysiu muset)
+                        break;
+                    case "Func1":
+                        //switch to 1st page of functions
+                        break;
+                    case "Func2":
+                        //Switch to 2nd page of functions
+                        break;
+                    default:
+                        if (clearFlag) {
+                            textField.setText("");
+                            clearFlag = false;
+                        }
+                        textField.setText(textField.getText() + command);
+                        break;
                 }
             }
         }
 
-        private double evaluateExpression(String expression) {
-            return CalculatorEngine.evaluate(expression);
-        }
-
-        private double evaluatePercentage(String expression) {
-            double result = CalculatorEngine.evaluate(expression);
-            return result / 100;
+        private void replaceButtonLabels(String[] newLabels) {
+            Component[] components = buttonPanel.getComponents();
+            for (int i = 0; i < Math.min(components.length, newLabels.length); i++) {
+                if (components[i] instanceof JButton) {
+                    JButton button = (JButton) components[i];
+                    button.setText(newLabels[i]);
+                }
+            }
         }
     }
+
+
+    private double evaluateExpression(String expression) {
+        return CalculatorEngine.evaluate(expression);
+    }
+
+    private double evaluatePercentage(String expression) {
+        double result = CalculatorEngine.evaluate(expression);
+        return result / 100;
+    }
+
 
     public static void main(String[] args) {
         new Calculator();
