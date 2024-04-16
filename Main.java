@@ -1,172 +1,394 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Arrays;
 
-public class Main{
-    static String num1 = "0";
-    static JLabel input_label = new JLabel(num1);
-    public static void main(String[] args) {
-        Color Theme_Color = new Color(19, 19, 19); //This color will be used as main background color
+public class Calculator {
+    static Color darker_gray = new Color(100,100,100);
+    static Color light_blue = new Color(123,159,207);
+    private JFrame frame;
+    private JTextField textField;
+    private JPanel buttonPanel;
 
-        //MAIN FRAME
-        JFrame Main_Page = new JFrame("Calculator");
+    private boolean clearFlag = false; // Flag to determine if the text field should be cleared after pressing CE
 
-        //INPUT/OUTPUT AREA
-        JPanel Input_Panel = new JPanel();
-        //JLabel input_label = new JLabel(num1);
-        //input_label.setLocation(0, 200);
-        input_label.setFont(new Font("Verdana", Font.BOLD, 70));
-        input_label.setForeground(Color.BLACK);
-        Input_Panel.setBackground(Color.BLUE);
-        //Input_Panel.add(input_label);
+    public Calculator() {
 
-        JPanel Func_Panel = new JPanel(new GridLayout(6, 4, 2, 2));
-        JPanel Switch_Panel = new JPanel();
 
-        //MAIN BUTTONS
-        String[] button_array = {"%", "CE", "C", "del", "1⁄x", "x²", "2√x", "/", "7", "8", "9", "x", "4", "5", "6", "-", "1", "2", "3", "+", "+/-", "0", ".", "="};
+        frame = new JFrame("Calculator");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(500, 600);
+        frame.setMinimumSize(new Dimension(500, 600));
+        frame.setLayout(new BorderLayout());
 
-        ButtonActionListener buttonListener = new ButtonActionListener();
 
-        for (int i = 0; i < button_array.length; i++) {
-            JButton button = new JButton(button_array[i]);
-            button.addActionListener(buttonListener);
-            Func_Panel.add(button);
-            button.setFont(new Font("Verdana", Font.BOLD, 25));
+        textField = new JTextField();
+        textField.setEditable(false);
+        textField.setBackground(new Color(39, 39, 39));
+        textField.setForeground(Color.WHITE);
+        textField.setFont(new Font("Verdana", Font.PLAIN, (frame.getHeight()+frame.getWidth())/30));
+        textField.setFocusable(false);
+        textField.setBorder(null);
+        textField.setPreferredSize(new Dimension(frame.getWidth(),frame.getHeight()/5));
+        frame.add(textField, BorderLayout.NORTH);
+
+        try { //Gets image from url & places it on icons
+            URL imageUrl = new URL("https://imgur.com/fVXag8E.jpg");
+            Image image = ImageIO.read(imageUrl);
+            frame.setIconImage(image);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        //SWITCH BUTTONS
-        JButton Func = new JButton("Func");
-        JButton Func1 = new JButton("Func1");
-        Switch_Panel.add(Func);
-        Switch_Panel.add(Func1);
-        Func.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Switch_Panel.setBackground(Color.YELLOW);
+
+        buttonPanel = new JPanel();
+        buttonPanel.setLayout(new GridLayout(5, 6, 1, 1));
+
+        String[][] buttonLabels = { //PATAISYK UI $$$
+                {"Func1", "Func2", "%", "CE", "del", "/"},
+                {"(", ")","7", "8", "9", "*"},
+                {"^", "abs","4", "5", "6", "-"},
+                {"rnd", "e","1", "2", "3", "+"},
+                {"π", "√","0", ".", "+/-", "="}
+
+
+        };
+        String[] darkerbuttons = {"Func1", "Func2", "%", "CE", "del", "/", "*", "-", "+"};
+        for (String[] row : buttonLabels) {
+            for (String label : row) {
+                JButton button = new JButton(label);
+                button.setFont(new Font("Verdana", Font.BOLD, (frame.getHeight()+frame.getWidth())/60));
+                button.setForeground(Color.WHITE);
+                button.setBackground(Color.GRAY);
+                Border originalBorder = BorderFactory.createLineBorder(Color.DARK_GRAY, 2);
+                button.setBorder(originalBorder);
+                Border hoverBorder = BorderFactory.createLineBorder(Color.LIGHT_GRAY, 2);
+
+                // Add a MouseListener to detect mouse enter and exit events
+                button.addMouseListener(new java.awt.event.MouseAdapter() {
+                    public void mouseEntered(java.awt.event.MouseEvent evt) {
+                        // Change border on mouse enter
+                        button.setBorder(hoverBorder);
+                    }
+
+                    public void mouseExited(java.awt.event.MouseEvent evt) {
+                        // Revert border on mouse exit
+                        button.setBorder(originalBorder);
+                    }
+                });
+                button.addActionListener(new ButtonClickListener());
+                button.setFocusPainted(false);
+                if(label.equals("=")){
+                    button.setBackground(light_blue);
+                }
+                if(Arrays.asList(darkerbuttons).contains(label)) {
+                    button.setBackground(darker_gray); // Set background color to blue
+                }
+                buttonPanel.add(button);
+            }
+        }
+        buttonPanel.setBackground(Color.DARK_GRAY);
+        frame.getContentPane().setBackground(Color.BLACK);
+        frame.add(buttonPanel, BorderLayout.CENTER);
+        frame.setLocationRelativeTo(null); //start program in the middle of the screen
+        frame.setVisible(true);
+        frame.addComponentListener(new ComponentAdapter() {
+            public void componentResized(ComponentEvent e) { //makes changes if the window has been resized
+
+                textField.setPreferredSize(new Dimension(frame.getWidth(), frame.getHeight() / 5));
+                textField.setFont(new Font("Verdana", Font.PLAIN, (frame.getHeight()+frame.getWidth())/30));
+                double ratio = (double) frame.getSize().height /(double)frame.getWidth();
+                System.out.print("W: "+  frame.getWidth() + "H: "+ frame.getHeight()+"ratio "+ratio+ "\n");
+                if(ratio>1.5){
+                    int height = (int) (frame.getWidth()*1.5);
+                    frame.setSize(frame.getWidth(), height);
+                }
+                // Calculate the new font size based on the frame's width and height
+                int newFontSize = (frame.getHeight() + frame.getWidth()) / 60;
+
+                // Loop through each button in the button panel and update its font size
+                for (Component component : buttonPanel.getComponents()) {
+                    if (component instanceof JButton) {
+                        JButton button = (JButton) component;
+                        button.setFont(new Font("Verdana", Font.BOLD, newFontSize));
+                    }
+                }
             }
         });
-
-        Func1.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Switch_Panel.setBackground(Color.DARK_GRAY);
-            }
-        });
-        // Set layouts
-        Main_Page.setLayout(new BorderLayout());
-        Input_Panel.setLayout(new BorderLayout());
-
-        // Set sizes (optional)
-        Input_Panel.setPreferredSize(new Dimension(800, 200));
-        input_label.setPreferredSize(new Dimension(800, 200));
-        Func_Panel.setPreferredSize(new Dimension(400, 600));
-        Switch_Panel.setPreferredSize(new Dimension(200, 600));
-
-        // Set backgrounds
-        Switch_Panel.setBackground(Color.ORANGE);
-        Func_Panel.setBackground(Color.RED);
-        Input_Panel.setBackground(Color.DARK_GRAY);
-        input_label.setBackground(Color.BLUE);
-
-        // Add components
-        //Main_Page.add(Input_Panel, BorderLayout.PAGE_START);
-        Main_Page.add(Func_Panel, BorderLayout.CENTER);
-        Main_Page.add(Switch_Panel, BorderLayout.WEST);
-        Main_Page.add(input_label,BorderLayout.NORTH);
-
-        Main_Page.setSize(800, 800);
-        Main_Page.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        Main_Page.setVisible(true);
     }
 
-    static class ButtonActionListener implements ActionListener {
+
+    private class ButtonClickListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            String command = e.getActionCommand();
-            // Perform actions based on the command
-            switch (command) {
-                case "%":
-                    System.out.println("% has been pressed");
-                    break;
-                case "CE":
-                    System.out.println("CE has been pressed");
-                    break;
-                case "C":
-                    System.out.println("C has been pressed");
-                    break;
-                case "del":
-                    System.out.println("del has been pressed");
-                    break;
-                case "1⁄x":
-                    System.out.println("1/x has been pressed");
-                    break;
-                case "x²":
-                    System.out.println("x^2 has been pressed");
-                    break;
-                case "2√x":
-                    System.out.println("vx has been pressed");
-                    break;
-                case "/":
-                    System.out.println("/ has been pressed");
-                    break;
-                case "7":
-                    System.out.println("7 has been pressed");
-                    break;
-                case "8":
-                    System.out.println("8 has been pressed");
-                    break;
-                case "9":
-                    System.out.println("9 has been pressed");
-                    break;
-                case "x":
-                    System.out.println("x has been pressed");
-                    break;
-                case "4":
-                    System.out.println("4 has been pressed");
-                    break;
-                case "5":
-                    System.out.println("5 has been pressed");
-                    break;
-                case "6":
-                    System.out.println("6 has been pressed");
-                    break;
-                case "-":
-                    System.out.println("- has been pressed");
-                    break;
-                case "1":
-                    System.out.println("1 has been pressed");
-                    num1 = "1";
-                    input_label.setText(num1);
+            JButton clickedButton = (JButton) e.getSource();
+            String buttonText = clickedButton.getText();
 
-                    break;
-                case "2":
-                    System.out.println("2 has been pressed");
-                    break;
-                case "3":
-                    System.out.println("3 has been pressed");
-                    num1="+";
-                    input_label.setText(num1);
-                    break;
-                case "+":
-                    System.out.println("+ has been pressed");
-                    break;
-                case "+/-":
-                    System.out.println("+/_ has been pressed");
-                    break;
-                case "0":
-                    System.out.println("0 has been pressed");
-                    break;
-                case ".":
-                    System.out.println(". has been pressed");
-                    break;
-                case "=a":
-                    System.out.println("= has been pressed");
-                    break;
-
-                default:
-                    System.out.println("Error, button has been pressed outside of the list");
-                    break;
+            if (buttonText.equals("Func2")) {
+                replaceButtonLabels(new String[]{"Func1", "Func2", "%", "CE", "del", "/", "!", "sin","7","8","9","*","cos", "tan","4","5","6","-","mean","stdevp", "1","2","3","+","atan", "acos"});
+            } else if (buttonText.equals("Func1")) {
+                replaceButtonLabels(new String[]{"Func1", "Func2", "%", "CE", "del", "/", "(", ")","7","8","9","*","^","abs","4","5","6","-","rnd","e", "1","2","3","+","π", "√"});
+            }
+            else {
+                String command = e.getActionCommand();
+                switch (command) {
+                    case "=":
+                        try {
+                            String expression = textField.getText();
+                            double result = evaluateExpression(expression);
+                            if (result == (long) result) {
+                                textField.setText(String.format("%d", (long) result));
+                            } else {
+                                textField.setText(Double.toString(result));
+                            }
+                            clearFlag = true;
+                        } catch (NumberFormatException | ArithmeticException ex) {
+                            textField.setText("Error");
+                        }
+                        break;
+                    case "CE":
+                        textField.setText("");
+                        break;
+                    case "del":
+                        String text = textField.getText();
+                        if (!text.isEmpty()) {
+                            textField.setText(text.substring(0, text.length() - 1));
+                        }
+                        break;
+                    case "%":
+                        try {
+                            String expression = textField.getText();
+                            double result = evaluatePercentage(expression);
+                            textField.setText(Double.toString(result));
+                            clearFlag = true;
+                        } catch (NumberFormatException | ArithmeticException ex) {
+                            textField.setText("Error");
+                        }
+                        break;
+                    case "+/-":
+                        //perdaug darbo del tokio sudo (poto padarysiu muset)
+                        break;
+                    case "Func1":
+                        //switch to 1st page of functions
+                        break;
+                    case "Func2":
+                        //Switch to 2nd page of functions
+                        break;
+                    default:
+                        if (clearFlag) {
+                            textField.setText("");
+                            clearFlag = false;
+                        }
+                        textField.setText(textField.getText() + command);
+                        break;
+                }
             }
         }
+
+        private void replaceButtonLabels(String[] newLabels) {
+            Component[] components = buttonPanel.getComponents();
+            for (int i = 0; i < Math.min(components.length, newLabels.length); i++) {
+                if (components[i] instanceof JButton) {
+                    JButton button = (JButton) components[i];
+                    button.setText(newLabels[i]);
+                }
+            }
+        }
+    }
+
+
+        private double evaluateExpression(String expression) {
+            return CalculatorEngine.evaluate(expression);
+        }
+
+        private double evaluatePercentage(String expression) {
+            double result = CalculatorEngine.evaluate(expression);
+            return result / 100;
+        }
+
+
+    public static void main(String[] args) {
+        new Calculator();
+    }
+}
+
+class CalculatorEngine {
+    public static double evaluate(String expression) {
+        return new Object() {
+            int pos = -1, ch;
+
+            double factorial(int n) {
+                if (n < 0) {
+                    throw new IllegalArgumentException("Factorial is not defined for negative numbers");
+                }
+                int result = 1;
+                for (int i = 2; i <= n; i++) {
+                    result *= i;
+                }
+                return result;
+            }
+
+            void nextChar() {
+                ch = (++pos < expression.length()) ? expression.charAt(pos) : -1;
+            }
+
+            boolean eat(int charToEat) {
+                while (ch == ' ') nextChar();
+                if (ch == charToEat) {
+                    nextChar();
+                    return true;
+                }
+                return false;
+            }
+
+            double parse() {
+                nextChar();
+                double x = parseExpression();
+                if (pos < expression.length()) throw new RuntimeException("Unexpected: " + (char) ch);
+                return x;
+            }
+
+            double parseExpression() {
+                double x = parseTerm();
+                for (; ; ) {
+                    if (eat('+')) x += parseTerm();
+                    else if (eat('-')) x -= parseTerm();
+                    else return x;
+                }
+            }
+
+            double parseTerm() {
+                double x = parseFactor();
+                for (; ; ) {
+                    if (eat('*')) {
+                        x *= parseFactor();
+                    } else if (eat('/')) {
+                        double divisor = parseFactor();
+                        if (divisor == 0) {
+                            throw new ArithmeticException("Division by zero");
+                        }
+                        x /= divisor;
+                    } else {
+                        return x;
+                    }
+                }
+            }
+
+            double parseFactor() {
+                if (eat('+')) return parseFactor();
+                if (eat('-')) return -parseFactor();
+                double x = 0;
+                int startPos = this.pos;
+
+                if (eat('(')) {
+                    x = parseExpression();
+                    eat(')');
+                } else if ((ch >= '0' && ch <= '9') || ch == '.') {
+                    while ((ch >= '0' && ch <= '9') || ch == '.') nextChar();
+                    x = Double.parseDouble(expression.substring(startPos, this.pos));
+                } else if (ch == 'a') {
+                    if (this.pos + 2 < expression.length() && expression.startsWith("abs", this.pos)) {
+                        this.pos += 3;
+                        eat('a');
+                        eat('(');
+                        x = Math.abs(parseExpression());
+                        eat(')');
+                    } else if (pos + 3 < expression.length() && expression.startsWith("atan", pos)) {
+                        pos += 3;
+                        eat('a');
+                        eat('(');
+                        x = Math.atan(parseExpression());
+                        x = Math.toDegrees(x);
+                        eat(')');
+                    } else if (pos + 3 < expression.length() && expression.startsWith("acos", pos)) {
+                        pos += 3;
+                        eat('a');
+                        eat('(');
+                        x = Math.acos(parseExpression());
+                        x = Math.toDegrees(x);
+                        eat(')');
+                    } else if (pos + 3 < expression.length() && expression.startsWith("asin", pos)) {
+                        pos += 3;
+                        eat('a');
+                        eat('(');
+                        x = Math.asin(parseExpression());
+                        x = Math.toDegrees(x);
+                        eat(')');
+                    }
+                } else if (ch == 'r') {
+                    if (this.pos + 4 < expression.length() && expression.startsWith("round", pos)) {
+                        pos += 5;
+                        eat('r');
+                        eat('(');
+                        x = Math.round(parseExpression());
+                        eat(')');
+                    }
+                } else if (ch == 'e') {
+                    eat('e');
+                    x = Math.E;
+                } else if (ch == 'π') {
+                    eat('π');
+                    x = Math.PI;
+                } else if (ch == '√') {
+                    eat('√');
+                    x = Math.sqrt(parseExpression());
+                } else if (ch == '!') {
+                    eat('!'); //reikes pataisyt kad parseExpression() skaitytu sitam is nugaros surinkes visus skaicius ir atiduotu (nemazai darbo)
+                    x = factorial((int) parseExpression());
+                } else if (ch == 's') {
+                    if (pos + 2 < expression.length() && expression.startsWith("sin", pos)) {
+                        pos += 2;
+                        eat('s');
+                        eat('(');
+                        x = Math.toRadians(parseExpression());
+                        x = Math.sin(x);
+                        eat(')');
+                    }
+                } else if (ch == 'c') {
+                    if (pos + 2 < expression.length() && expression.startsWith("cos", pos)) {
+                        pos += 2;
+                        eat('c');
+                        eat('(');
+                        x = Math.toRadians(parseExpression());
+                        x = Math.cos(x);
+                        eat(')');
+                    }
+                } else if (ch == 't') {
+                    if (pos + 2 < expression.length() && expression.startsWith("tan", pos)) {
+                        pos += 2;
+                        eat('t');
+                        eat('(');
+                        x = Math.toRadians(parseExpression());
+                        x = Math.tan(x);
+                        eat(')');
+                    }
+                } else if (ch == 'l') {
+                    if (pos + 2 < expression.length() && expression.startsWith("log", pos)) {
+                        pos += 2;
+                        eat('l');
+                        eat('(');
+                        x = Math.log(parseExpression());
+                        eat(')');
+                    } else if (pos + 1 < expression.length() && expression.startsWith("ln", pos)) {
+                        pos += 1;
+                        eat('l');
+                        eat('(');
+                        x = Math.log1p(parseExpression());
+                        eat(')');
+                    }
+                }
+                else {
+                    throw new RuntimeException("Unexpected: " + (char) ch);
+                }
+
+                if (eat('^')) x = Math.pow(x, parseFactor());
+                return x;
+            }
+        }.parse();
     }
 }
