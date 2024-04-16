@@ -49,7 +49,7 @@ public class Calculator {
         buttonPanel.setLayout(new GridLayout(6, 6, 1, 1));
 
         String[][] buttonLabels = {
-                {"(", ")", "^", "!", "abs", "rnd"},
+                {"(", ")", "^", "!", "abs", "round"},
                 {"Func1", "Func2", "%", "CE", "del", "/"},
                 {"e", "√","7", "8", "9", "*"},
                 {"π", "mean","4", "5", "6", "-"},
@@ -58,7 +58,7 @@ public class Calculator {
 
 
         };
-        String[] darkerbuttons = {"Func1", "Func2", "%", "CE", "del", "/", "*", "-", "+", "(", ")", "^", "abs", "rnd", "e", "π", "√", "!", "mean", "cos", "sin", "tan", ","};
+        String[] darkerButtons = {"Func1", "Func2", "%", "CE", "del", "/", "*", "-", "+", "(", ")", "^", "abs", "round", "e", "π", "√", "!", "mean", "cos", "sin", "tan", ","};
         for (String[] row : buttonLabels) {
             for (String label : row) {
                 JButton button = new JButton(label);
@@ -86,7 +86,7 @@ public class Calculator {
                 if(label.equals("=")){
                     button.setBackground(light_blue);
                 }
-                if(Arrays.asList(darkerbuttons).contains(label)) {
+                if(Arrays.asList(darkerButtons).contains(label)) {
                     button.setBackground(darker_gray); // Set background color to blue
                 }
                 buttonPanel.add(button);
@@ -135,10 +135,10 @@ public class Calculator {
 
             if (buttonText.equals("Func2")) {
                 //buttonPanel.setLayout(new GridLayout(6, 6, 1, 1));
-                replaceButtonLabels(new String[]{"(", ")", "^", "!", "abs", "rnd", "Func1", "Func2","%","CE","del","/","asin", "acos","7","8","9","*","atan","stdevp", "4","5","6","-","nPr", "nCr","1","2","3","+","log","ln","0",".","+/-","="});
+                replaceButtonLabels(new String[]{"(", ")", "^", "!", "abs", "round", "Func1", "Func2","%","CE","del","/","asin", "acos","7","8","9","*","atan","stdevp", "4","5","6","-","nPr", "nCr","1","2","3","+","log","ln","0",".","+/-","="});
             } else if (buttonText.equals("Func1")) {
                 //buttonPanel.setLayout(new GridLayout(5, 6, 1, 1));
-                replaceButtonLabels(new String[]{"(", ")", "^", "!", "abs", "rnd", "Func1", "Func2","%","CE","del","/","e", "√","7","8","9","*","π","mean", "4","5","6","-","sin", "cos","1","2","3","+","tan",",","0",".","+/-","="});
+                replaceButtonLabels(new String[]{"(", ")", "^", "!", "abs", "round", "Func1", "Func2","%","CE","del","/","e", "√","7","8","9","*","π","mean", "4","5","6","-","sin", "cos","1","2","3","+","tan",",","0",".","+/-","="});
             }
             else {
                 String command = e.getActionCommand();
