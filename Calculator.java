@@ -46,18 +46,19 @@ public class Calculator {
         }
 
         buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(5, 6, 1, 1));
+        buttonPanel.setLayout(new GridLayout(6, 6, 1, 1));
 
-        String[][] buttonLabels = { //PATAISYK UI $$$
+        String[][] buttonLabels = {
+                {"(", ")", "^", "!", "abs", "rnd"},
                 {"Func1", "Func2", "%", "CE", "del", "/"},
-                {"(", ")","7", "8", "9", "*"},
-                {"^", "abs","4", "5", "6", "-"},
-                {"rnd", "e","1", "2", "3", "+"},
-                {"π", "√","0", ".", "+/-", "="}
+                {"e", "√","7", "8", "9", "*"},
+                {"π", "mean","4", "5", "6", "-"},
+                {"sin", "cos","1", "2", "3", "+"},
+                {"tan", ",","0", ".", "+/-", "="}
 
 
         };
-        String[] darkerbuttons = {"Func1", "Func2", "%", "CE", "del", "/", "*", "-", "+"};
+        String[] darkerbuttons = {"Func1", "Func2", "%", "CE", "del", "/", "*", "-", "+", "(", ")", "^", "abs", "rnd", "e", "π", "√", "!", "mean", "cos", "sin", "tan", ","};
         for (String[] row : buttonLabels) {
             for (String label : row) {
                 JButton button = new JButton(label);
@@ -133,9 +134,11 @@ public class Calculator {
             String buttonText = clickedButton.getText();
 
             if (buttonText.equals("Func2")) {
-                replaceButtonLabels(new String[]{"Func1", "Func2", "%", "CE", "del", "/", "!", "sin","7","8","9","*","cos", "tan","4","5","6","-","mean","stdevp", "1","2","3","+","atan", "acos"});
+                //buttonPanel.setLayout(new GridLayout(6, 6, 1, 1));
+                replaceButtonLabels(new String[]{"(", ")", "^", "!", "abs", "rnd", "Func1", "Func2","%","CE","del","/","asin", "acos","7","8","9","*","atan","stdevp", "4","5","6","-","nPr", "nCr","1","2","3","+","log","ln","0",".","+/-","="});
             } else if (buttonText.equals("Func1")) {
-                replaceButtonLabels(new String[]{"Func1", "Func2", "%", "CE", "del", "/", "(", ")","7","8","9","*","^","abs","4","5","6","-","rnd","e", "1","2","3","+","π", "√"});
+                //buttonPanel.setLayout(new GridLayout(5, 6, 1, 1));
+                replaceButtonLabels(new String[]{"(", ")", "^", "!", "abs", "rnd", "Func1", "Func2","%","CE","del","/","e", "√","7","8","9","*","π","mean", "4","5","6","-","sin", "cos","1","2","3","+","tan",",","0",".","+/-","="});
             }
             else {
                 String command = e.getActionCommand();
