@@ -2,13 +2,11 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
+import java.awt.event.*;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
+import java.awt.Robot;
 
 public class Calculator {
     static Color darker_gray = new Color(100,100,100);
@@ -104,10 +102,15 @@ public class Calculator {
                 textField.setPreferredSize(new Dimension(frame.getWidth(), frame.getHeight() / 5));
                 textField.setFont(new Font("Verdana", Font.PLAIN, (frame.getHeight()+frame.getWidth())/30));
                 double ratio = (double) frame.getSize().height /(double)frame.getWidth();
-                System.out.print("W: "+  frame.getWidth() + "H: "+ frame.getHeight()+"ratio "+ratio+ "\n");
                 if(ratio>1.5){
                     int height = (int) (frame.getWidth()*1.5);
                     frame.setSize(frame.getWidth(), height);
+                    try {
+                        Robot robot = new Robot();
+                        robot.mouseRelease(MouseEvent.BUTTON1_DOWN_MASK);
+                    } catch (AWTException ex) {
+                        throw new RuntimeException(ex);
+                    }
                 }
                 // Calculate the new font size based on the frame's width and height
                 int newFontSize = (frame.getHeight() + frame.getWidth()) / 60;
