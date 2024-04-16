@@ -173,12 +173,6 @@ public class Calculator {
                     case "+/-":
                         //perdaug darbo del tokio sudo (poto padarysiu muset)
                         break;
-                    case "Func1":
-                        //switch to 1st page of functions
-                        break;
-                    case "Func2":
-                        //Switch to 2nd page of functions
-                        break;
                     default:
                         if (clearFlag) {
                             textField.setText("");
