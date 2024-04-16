@@ -176,7 +176,8 @@ public class Calculator {
                         }
                         break;
                     case "+/-":
-                        //perdaug darbo del tokio sudo (poto padarysiu muset)
+                        String expression = textField.getText();
+                        int length = expression.length();
                         break;
                     default:
                         if (clearFlag) {
