@@ -293,31 +293,31 @@ class CalculatorEngine {
                     x = Double.parseDouble(expression.substring(startPos, this.pos));
                 } else if (ch == 'a') {
                     if (this.pos + 2 < expression.length() && expression.startsWith("abs", this.pos)) {
-                        this.pos += 3;
+                        pos += 2;
                         eat('a');
                         eat('(');
                         x = Math.abs(parseExpression());
                         eat(')');
-                    } else if (pos + 3 < expression.length() && expression.startsWith("atan", pos)) {
-                        pos += 3;
+                    }
+                    if (expression.startsWith("atan", pos) || expression.startsWith("acos", pos) || expression.startsWith("asin", pos)) {
+                        String type = expression.substring(pos, pos + 4);
+                        this.pos += 3;
                         eat('a');
                         eat('(');
-                        x = Math.atan(parseExpression());
-                        x = Math.toDegrees(x);
-                        eat(')');
-                    } else if (pos + 3 < expression.length() && expression.startsWith("acos", pos)) {
-                        pos += 3;
-                        eat('a');
-                        eat('(');
-                        x = Math.acos(parseExpression());
-                        x = Math.toDegrees(x);
-                        eat(')');
-                    } else if (pos + 3 < expression.length() && expression.startsWith("asin", pos)) {
-                        pos += 3;
-                        eat('a');
-                        eat('(');
-                        x = Math.asin(parseExpression());
-                        x = Math.toDegrees(x);
+                        switch (type) {
+                            case "atan" -> {
+                                x = Math.atan(parseExpression());
+                                x = Math.toDegrees(x);
+                            }
+                            case "acos" -> {
+                                x = Math.acos(parseExpression());
+                                x = Math.toDegrees(x);
+                            }
+                            case "asin" -> {
+                                x = Math.asin(parseExpression());
+                                x = Math.toDegrees(x);
+                            }
+                        }
                         eat(')');
                     }
                 } else if (ch == 'r') {
