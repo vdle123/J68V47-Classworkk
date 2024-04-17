@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.awt.Robot;
 
@@ -118,8 +119,7 @@ public class Calculator {
 
                 // Loop through each button in the button panel and update its font size
                 for (Component component : buttonPanel.getComponents()) {
-                    if (component instanceof JButton) {
-                        JButton button = (JButton) component;
+                    if (component instanceof JButton button) {
                         button.setFont(new Font("Verdana", Font.BOLD, newFontSize));
                     }
                 }
@@ -335,7 +335,7 @@ class CalculatorEngine {
                     eat('√');
                     x = Math.sqrt(parseExpression());
                 } else if (ch == '!') {
-                    eat('!'); //reikes pataisyt kad parseExpression() skaitytu sitam is nugaros surinkes visus skaicius ir atiduotu (nemazai darbo)
+                    eat('!');
                     x = factorial((int) parseExpression());
                 } else if (ch == 's') {
                     if (pos + 2 < expression.length() && expression.startsWith("sin", pos)) {
@@ -349,8 +349,24 @@ class CalculatorEngine {
                         pos += 5;
                         eat('s');
                         eat('(');
-
+                        ArrayList<Double> values = new ArrayList<>();
+                        while (expression.charAt(pos) != ')') {
+                            values.add(parseExpression());
+                            if (expression.charAt(pos) == ',') {
+                                eat(',');
+                            }
+                        }
                         eat(')');
+                        double sum = 0;
+                        for (double value : values) {
+                            sum += value;
+                        }
+                        double mean = sum / values.size();
+                        double sumOfSquares = 0;
+                        for (double value : values) {
+                            sumOfSquares += Math.pow(value - mean, 2);
+                        }
+                        return Math.sqrt(sumOfSquares / values.size());
                     }
                 } else if (ch == 'c') {
                     if (pos + 2 < expression.length() && expression.startsWith("cos", pos)) {
