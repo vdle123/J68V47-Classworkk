@@ -175,7 +175,24 @@ public class Calculator {
                     }
                     case "+/-" -> {
                         String expression = textField.getText();
-                        int length = expression.length();
+                        StringBuilder temp = new StringBuilder();
+                        for (int i = expression.length() - 1; i >= 0; i--) {
+                            char ch = expression.charAt(i);
+                            if (Character.isDigit(ch) || ch == '.') {
+                                temp.insert(0, ch);
+                            } else if (ch == '-') {
+                                temp.deleteCharAt(0);
+                                break;
+                            } else {
+                                break;
+                            }
+                        }
+                        if (!temp.isEmpty()) {
+                            double num = Double.parseDouble(temp.toString());
+                            num = -num;
+                            expression = expression.substring(0, expression.length() - temp.length()) + num;
+                            textField.setText(expression);
+                        }
                     }
                     default -> {
                         if (clearFlag) {
