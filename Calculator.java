@@ -142,7 +142,7 @@ public class Calculator {
             } else {
                 String command = e.getActionCommand();
                 switch (command) {
-                    case "=":
+                    case "=" -> {
                         try {
                             String expression = textField.getText();
                             double result = evaluateExpression(expression);
@@ -155,17 +155,15 @@ public class Calculator {
                         } catch (NumberFormatException | ArithmeticException ex) {
                             textField.setText("Error");
                         }
-                        break;
-                    case "CE":
-                        textField.setText("");
-                        break;
-                    case "del":
+                    }
+                    case "CE" -> textField.setText("");
+                    case "del" -> {
                         String text = textField.getText();
                         if (!text.isEmpty()) {
                             textField.setText(text.substring(0, text.length() - 1));
                         }
-                        break;
-                    case "%":
+                    }
+                    case "%" -> {
                         try {
                             String expression = textField.getText();
                             double result = evaluatePercentage(expression);
@@ -174,18 +172,18 @@ public class Calculator {
                         } catch (NumberFormatException | ArithmeticException ex) {
                             textField.setText("Error");
                         }
-                        break;
-                    case "+/-":
+                    }
+                    case "+/-" -> {
                         String expression = textField.getText();
                         int length = expression.length();
-                        break;
-                    default:
+                    }
+                    default -> {
                         if (clearFlag) {
                             textField.setText("");
                             clearFlag = false;
                         }
                         textField.setText(textField.getText() + command);
-                        break;
+                    }
                 }
             }
         }
@@ -193,8 +191,7 @@ public class Calculator {
         private void replaceButtonLabels(String[] newLabels) {
             Component[] components = buttonPanel.getComponents();
             for (int i = 0; i < Math.min(components.length, newLabels.length); i++) {
-                if (components[i] instanceof JButton) {
-                    JButton button = (JButton) components[i];
+                if (components[i] instanceof JButton button) {
                     button.setText(newLabels[i]);
                 }
             }
