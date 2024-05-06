@@ -10,22 +10,46 @@ import java.util.Arrays;
 import java.awt.Robot;
 
 public class Calculator {
+    static String[] darkerButtons = {"Func1", "Func2", "%", "CE", "del", "/", "*", "-", "+", "(", ")", "^", "abs", "round", "e", "π", "√", "!", "mean", "cos", "sin", "tan", ","};
+    enum Theme {
+        LIGHT,
+        DARK
+    }
+    Theme currentTheme = Theme.DARK; //Theme by default
+    private final Color lightBackgroundColor = Color.WHITE;
+    private final Color darkBackgroundColor = Color.BLACK;
+    private final Color lightForegroundColor = Color.BLACK;
+    private final Color darkForegroundColor = Color.WHITE;
     static Color darker_gray = new Color(100, 100, 100);
     static Color light_blue = new Color(123, 159, 207);
     private JFrame frame;
     private JTextField textField;
     private JPanel buttonPanel;
+    private JMenuBar menubar;
+    private  JMenu menu;
 
     private boolean clearFlag = false; // Flag to determine if the text field should be cleared after pressing CE
 
     public Calculator() {
-
-
         frame = new JFrame("Calculator");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(500, 600);
         frame.setMinimumSize(new Dimension(500, 600));
         frame.setLayout(new BorderLayout());
+
+        menubar = new JMenuBar();
+        frame.setJMenuBar(menubar);
+
+        menu = new JMenu("Themes");
+        menubar.add(menu);
+
+        JMenuItem lightThemeItem = new JMenuItem("Light Mode");
+        JMenuItem darkThemeItem = new JMenuItem("Dark Mode");
+
+        menu.add(lightThemeItem);
+        menu.add(darkThemeItem);
+
+
 
 
         textField = new JTextField();
@@ -46,6 +70,7 @@ public class Calculator {
             e.printStackTrace();
         }
 
+
         buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridLayout(6, 6, 1, 1));
 
@@ -56,8 +81,6 @@ public class Calculator {
                 {"π", "mean", "4", "5", "6", "-"},
                 {"sin", "cos", "1", "2", "3", "+"},
                 {"tan", ",", "0", ".", "+/-", "="}
-
-
         };
         String[] darkerButtons = {"Func1", "Func2", "%", "CE", "del", "/", "*", "-", "+", "(", ")", "^", "abs", "round", "e", "π", "√", "!", "mean", "cos", "sin", "tan", ","};
         for (String[] row : buttonLabels) {
@@ -74,7 +97,9 @@ public class Calculator {
                 button.addMouseListener(new java.awt.event.MouseAdapter() {
                     public void mouseEntered(java.awt.event.MouseEvent evt) {
                         // Change border on mouse enter
-                        button.setBorder(hoverBorder);
+                        if (button.getBackground() == darker_gray || button.getBackground() == Color.GRAY) {
+                            button.setBorder(hoverBorder);
+                        }
                     }
 
                     public void mouseExited(java.awt.event.MouseEvent evt) {
@@ -82,13 +107,20 @@ public class Calculator {
                         button.setBorder(originalBorder);
                     }
                 });
+                button.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseEntered(MouseEvent e) {
+                        button.setBorder(hoverBorder);
+                    }
+                });
+
                 button.addActionListener(new ButtonClickListener());
                 button.setFocusPainted(false);
                 if (label.equals("=")) {
                     button.setBackground(light_blue);
                 }
-                if (Arrays.asList(darkerButtons).contains(label)) {
-                    button.setBackground(darker_gray); // Set background color to blue
+                if (Arrays.asList(darkerButtons).contains(label)&&currentTheme==Theme.DARK) {
+                    button.setBackground(darker_gray); // Set background color to gray
                 }
                 buttonPanel.add(button);
             }
@@ -124,20 +156,93 @@ public class Calculator {
                     }
                 }
             }
+
+        });
+        lightThemeItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setTheme(Theme.LIGHT);
+                updateButtonColors();
+            }
+        });
+
+        darkThemeItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setTheme(Theme.DARK);
+                updateButtonColors();
+            }
         });
     }
 
+    private void applyTheme() {
+        switch (currentTheme) {
+            case LIGHT:
+                frame.getContentPane().setBackground(lightBackgroundColor);
+                textField.setBackground(lightBackgroundColor);
+                textField.setForeground(lightForegroundColor);
+                buttonPanel.setBackground(Color.WHITE);
 
+
+
+
+                break;
+            case DARK:
+                frame.getContentPane().setBackground(darkBackgroundColor);
+                textField.setBackground(new Color(39,39,39));
+                textField.setForeground(darkForegroundColor);
+                buttonPanel.setBackground(Color.DARK_GRAY);
+                break;
+        }
+    }
+    private void updateButtonColors() {
+        if (currentTheme == Theme.LIGHT) {
+            for (Component component : buttonPanel.getComponents()) {
+                if (component instanceof JButton) {
+                    JButton button = (JButton) component;
+                    if (Arrays.asList(darkerButtons).contains(button.getText())) {
+                        button.setBackground(Color.lightGray);
+                        button.setForeground(Color.BLACK);
+                    } else if (button.getText()=="="){
+                        button.setBackground(light_blue);
+
+                    }else {
+                        button.setBackground(Color.WHITE);
+                        button.setForeground(Color.BLACK);
+                    }
+                }
+            }
+        } else {
+            for (Component component : buttonPanel.getComponents()) {
+                if (component instanceof JButton) {
+                    JButton button = (JButton) component;
+                    if (Arrays.asList(darkerButtons).contains(button.getText())) {
+                        button.setBackground(darker_gray);
+                        button.setForeground(Color.WHITE);
+                    }
+                    else if(button.getText()=="="){
+                        button.setBackground(light_blue);
+                    }else{
+                        button.setBackground(Color.GRAY);
+                        button.setForeground(Color.WHITE);
+                    }
+
+                }
+            }
+        }
+    }
+    private void setTheme(Theme theme) {
+        currentTheme = theme;
+        applyTheme();
+    }
     private class ButtonClickListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             JButton clickedButton = (JButton) e.getSource();
             String buttonText = clickedButton.getText();
 
             if (buttonText.equals("Func2")) {
-                //buttonPanel.setLayout(new GridLayout(6, 6, 1, 1));
                 replaceButtonLabels(new String[]{"(", ")", "^", "!", "abs", "round", "Func1", "Func2", "%", "CE", "del", "/", "asin", "acos", "7", "8", "9", "*", "atan", "stdevp", "4", "5", "6", "-", "nPr", "nCr", "1", "2", "3", "+", "log", "ln", "0", ".", "+/-", "="});
             } else if (buttonText.equals("Func1")) {
-                //buttonPanel.setLayout(new GridLayout(5, 6, 1, 1));
                 replaceButtonLabels(new String[]{"(", ")", "^", "!", "abs", "round", "Func1", "Func2", "%", "CE", "del", "/", "e", "√", "7", "8", "9", "*", "π", "mean", "4", "5", "6", "-", "sin", "cos", "1", "2", "3", "+", "tan", ",", "0", ".", "+/-", "="});
             } else {
                 String command = e.getActionCommand();
