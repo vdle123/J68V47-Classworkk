@@ -163,16 +163,6 @@ public class Calculator {
                             textField.setText(text.substring(0, text.length() - 1));
                         }
                     }
-                    case "%" -> {
-                        try {
-                            String expression = textField.getText();
-                            double result = evaluatePercentage(expression);
-                            textField.setText(Double.toString(result));
-                            clearFlag = true;
-                        } catch (NumberFormatException | ArithmeticException ex) {
-                            textField.setText("Error");
-                        }
-                    }
                     case "+/-" -> {
                         String expression = textField.getText();
                         StringBuilder temp = new StringBuilder();
@@ -219,12 +209,6 @@ public class Calculator {
     private double evaluateExpression(String expression) {
         return CalculatorEngine.evaluate(expression);
     }
-
-    private double evaluatePercentage(String expression) {
-        double result = CalculatorEngine.evaluate(expression);
-        return result / 100;
-    }
-
 
     public static void main(String[] args) {
         new Calculator();
@@ -287,6 +271,12 @@ class CalculatorEngine {
                             throw new ArithmeticException("Division by zero");
                         }
                         x /= divisor;
+                    } else if (eat('%')) {
+                        double mod = parseFactor();
+                        if (mod == 0) {
+                            throw new ArithmeticException("Modulus by zero");
+                        }
+                        x %= mod;
                     } else {
                         return x;
                     }
