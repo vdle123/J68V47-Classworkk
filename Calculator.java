@@ -11,10 +11,12 @@ import java.awt.Robot;
 
 public class Calculator {
     static String[] darkerButtons = {"Func1", "Func2", "%", "CE", "del", "/", "*", "-", "+", "(", ")", "^", "abs", "round", "e", "π", "√", "!", "mean", "cos", "sin", "tan", ","};
+
     enum Theme {
         LIGHT,
         DARK
     }
+
     Theme currentTheme = Theme.DARK; //Theme by default
     private final Color lightBackgroundColor = Color.WHITE;
     private final Color darkBackgroundColor = Color.BLACK;
@@ -26,7 +28,7 @@ public class Calculator {
     private JTextField textField;
     private JPanel buttonPanel;
     private JMenuBar menubar;
-    private  JMenu menu;
+    private JMenu menu;
 
     private boolean clearFlag = false; // Flag to determine if the text field should be cleared after pressing CE
 
@@ -48,8 +50,6 @@ public class Calculator {
 
         menu.add(lightThemeItem);
         menu.add(darkThemeItem);
-
-
 
 
         textField = new JTextField();
@@ -119,7 +119,7 @@ public class Calculator {
                 if (label.equals("=")) {
                     button.setBackground(light_blue);
                 }
-                if (Arrays.asList(darkerButtons).contains(label)&&currentTheme==Theme.DARK) {
+                if (Arrays.asList(darkerButtons).contains(label) && currentTheme == Theme.DARK) {
                     button.setBackground(darker_gray); // Set background color to gray
                 }
                 buttonPanel.add(button);
@@ -184,17 +184,16 @@ public class Calculator {
                 buttonPanel.setBackground(Color.WHITE);
 
 
-
-
                 break;
             case DARK:
                 frame.getContentPane().setBackground(darkBackgroundColor);
-                textField.setBackground(new Color(39,39,39));
+                textField.setBackground(new Color(39, 39, 39));
                 textField.setForeground(darkForegroundColor);
                 buttonPanel.setBackground(Color.DARK_GRAY);
                 break;
         }
     }
+
     private void updateButtonColors() {
         if (currentTheme == Theme.LIGHT) {
             for (Component component : buttonPanel.getComponents()) {
@@ -203,10 +202,10 @@ public class Calculator {
                     if (Arrays.asList(darkerButtons).contains(button.getText())) {
                         button.setBackground(Color.lightGray);
                         button.setForeground(Color.BLACK);
-                    } else if (button.getText()=="="){
+                    } else if (button.getText() == "=") {
                         button.setBackground(light_blue);
 
-                    }else {
+                    } else {
                         button.setBackground(Color.WHITE);
                         button.setForeground(Color.BLACK);
                     }
@@ -219,10 +218,9 @@ public class Calculator {
                     if (Arrays.asList(darkerButtons).contains(button.getText())) {
                         button.setBackground(darker_gray);
                         button.setForeground(Color.WHITE);
-                    }
-                    else if(button.getText()=="="){
+                    } else if (button.getText() == "=") {
                         button.setBackground(light_blue);
-                    }else{
+                    } else {
                         button.setBackground(Color.GRAY);
                         button.setForeground(Color.WHITE);
                     }
@@ -231,10 +229,12 @@ public class Calculator {
             }
         }
     }
+
     private void setTheme(Theme theme) {
         currentTheme = theme;
         applyTheme();
     }
+
     private class ButtonClickListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             JButton clickedButton = (JButton) e.getSource();
@@ -257,8 +257,12 @@ public class Calculator {
                                 textField.setText(Double.toString(result));
                             }
                             clearFlag = true;
-                        } catch (NumberFormatException | ArithmeticException ex) {
-                            textField.setText("Error");
+                        } catch (NumberFormatException ex) {
+                            textField.setText("Invalid input error");
+                            clearFlag = true;
+                        } catch (ArithmeticException ex) {
+                            textField.setText("Division by zero");
+                            clearFlag = true;
                         }
                     }
                     case "CE" -> textField.setText("");
