@@ -275,23 +275,44 @@ public class Calculator {
                     case "+/-" -> {
                         String expression = textField.getText();
                         StringBuilder temp = new StringBuilder();
+                        int lastNumberStart = -1;
+                        int lastNumberEnd = expression.length() - 1;
+
                         for (int i = expression.length() - 1; i >= 0; i--) {
                             char ch = expression.charAt(i);
                             if (Character.isDigit(ch) || ch == '.') {
+                                if (lastNumberEnd == expression.length() - 1) {
+                                    lastNumberEnd = i;
+                                }
                                 temp.insert(0, ch);
                             } else if (ch == '-') {
-                                temp.deleteCharAt(0);
+                                if (i == 0 || !Character.isDigit(expression.charAt(i - 1))) {
+                                    temp.insert(0, ch);
+                                    lastNumberStart = i;
+                                } else {
+                                    lastNumberStart = i + 1;
+                                }
                                 break;
                             } else {
+                                lastNumberStart = i + 1;
                                 break;
                             }
                         }
-                        if (!temp.isEmpty()) {
-                            double num = Double.parseDouble(temp.toString());
-                            num = -num;
-                            expression = expression.substring(0, expression.length() - temp.length()) + num;
-                            textField.setText(expression);
+
+                        if (lastNumberStart == -1) {
+                            lastNumberStart = 0;
                         }
+
+                        if (!temp.isEmpty()) {
+                            if (temp.charAt(0) == '-') {
+                                temp.deleteCharAt(0);
+                            } else {
+                                temp.insert(0, '-');
+                            }
+                        }
+
+                        expression = expression.substring(0, lastNumberStart) + temp + expression.substring(lastNumberEnd + 1);
+                        textField.setText(expression);
                     }
                     default -> {
                         if (clearFlag) {
