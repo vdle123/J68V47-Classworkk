@@ -542,13 +542,13 @@ class CalculatorEngine {
                         pos += 2;
                         eat('l');
                         eat('(');
-                        x = Math.log(parseExpression());
+                        x = Math.log10(parseExpression());
                         eat(')');
                     } else if (pos + 1 < expression.length() && expression.startsWith("ln", pos)) {
                         pos += 1;
                         eat('l');
                         eat('(');
-                        x = Math.log1p(parseExpression());
+                        x = Math.log(parseExpression());
                         eat(')');
                     }
                 } else if (ch == 'm') {
