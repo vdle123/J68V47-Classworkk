@@ -25,12 +25,20 @@ public class Calculator {
     static Color darker_gray = new Color(100, 100, 100);
     static Color light_blue = new Color(123, 159, 207);
     private JFrame frame;
-    private JTextField textField;
+    private static JTextField textField;
     private JPanel buttonPanel;
     private JMenuBar menubar;
     private JMenu menu;
 
-    private boolean clearFlag = false; // Flag to determine if the text field should be cleared after pressing CE
+    static private boolean clearFlag = false; // Flag to determine if the text field should be cleared after pressing CE
+
+    public static void setTextField(String error) {
+        textField.setText(error);
+    }
+
+    public static void setClearFlagTrue() {
+        clearFlag = true;
+    }
 
     public Calculator() {
         frame = new JFrame("Calculator");
@@ -352,6 +360,8 @@ class CalculatorEngine {
 
             double factorial(int n) {
                 if (n < 0) {
+                    Calculator.setTextField("Invalid negative input");
+                    Calculator.setClearFlagTrue();
                     throw new IllegalArgumentException("Factorial is not defined for negative numbers");
                 }
                 int result = 1;
@@ -398,12 +408,16 @@ class CalculatorEngine {
                     } else if (eat('/')) {
                         double divisor = parseFactor();
                         if (divisor == 0) {
+                            Calculator.setTextField("Division by zero");
+                            Calculator.setClearFlagTrue();
                             throw new ArithmeticException("Division by zero");
                         }
                         x /= divisor;
                     } else if (eat('%')) {
                         double mod = parseFactor();
                         if (mod == 0) {
+                            Calculator.setTextField("Modulus by zero");
+                            Calculator.setClearFlagTrue();
                             throw new ArithmeticException("Modulus by zero");
                         }
                         x %= mod;
@@ -567,8 +581,11 @@ class CalculatorEngine {
                         eat(',');
                         double r = parseExpression();
                         eat(')');
-                        if (r < 0 || r > n)
+                        if (r < 0 || r > n) {
+                            Calculator.setTextField("Invalid input");
+                            Calculator.setClearFlagTrue();
                             throw new IllegalArgumentException("Invalid input. n and r must be non-negative, and r must be less than or equal to n.");
+                        }
                         if (type.equals("nPr")) {
                             return factorial((int) n) / factorial((int) (n - r));
                         } else if (type.equals("nCr")) {
