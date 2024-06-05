@@ -10,11 +10,12 @@ import java.util.Arrays;
 import java.awt.Robot;
 
 public class Calculator {
-    static String[] darkerButtons = {"Func1", "Func2", "%", "CE", "del", "/", "*", "-", "+", "(", ")", "^", "abs", "round", "e", "π", "√", "!", "mean", "cos", "sin", "tan", ","};
+    static String[] darkerButtons = {"Func1", "Func2", "%", "CE", "del", "/", "*", "-", "+", "(", ")", "^", "abs", "round", "e", "π", "√", "!", "mean", "cos", "sin", "tan", ",", "asin", "acos", "atan", "stdevp", "nPr", "nCr", "log", "ln"};
 
     enum Theme {
         LIGHT,
-        DARK
+        DARK,
+        CUSTOM
     }
 
     Theme currentTheme = Theme.DARK; //Theme by default
@@ -29,6 +30,7 @@ public class Calculator {
     private JPanel buttonPanel;
     private JMenuBar menubar;
     private JMenu menu;
+    static Color ButtonColor, ButtonOutlineColor, ButtonLightUpColor, ButtonTextColor, DarkerButtonColor, EqualsButtonColor, FrameColor = Color.BLACK;
 
     static private boolean clearFlag = false; // Flag to determine if the text field should be cleared after pressing CE
 
@@ -50,14 +52,18 @@ public class Calculator {
         menubar = new JMenuBar();
         frame.setJMenuBar(menubar);
 
-        menu = new JMenu("Themes");
+        menu = new JMenu("Modes");
         menubar.add(menu);
+        menubar.setBackground(Color.LIGHT_GRAY);
+        menubar.setBorderPainted(false);
 
         JMenuItem lightThemeItem = new JMenuItem("Light Mode");
         JMenuItem darkThemeItem = new JMenuItem("Dark Mode");
+        JMenuItem CustomThemeItem = new JMenuItem("Custom Mode");
 
         menu.add(lightThemeItem);
         menu.add(darkThemeItem);
+        menu.add(CustomThemeItem);
 
 
         textField = new JTextField();
@@ -90,7 +96,6 @@ public class Calculator {
                 {"sin", "cos", "1", "2", "3", "+"},
                 {"tan", ",", "0", ".", "+/-", "="}
         };
-        String[] darkerButtons = {"Func1", "Func2", "%", "CE", "del", "/", "*", "-", "+", "(", ")", "^", "abs", "round", "e", "π", "√", "!", "mean", "cos", "sin", "tan", ","};
         for (String[] row : buttonLabels) {
             for (String label : row) {
                 JButton button = new JButton(label);
@@ -105,20 +110,33 @@ public class Calculator {
                 button.addMouseListener(new java.awt.event.MouseAdapter() {
                     public void mouseEntered(java.awt.event.MouseEvent evt) {
                         // Change border on mouse enter
-                        if (button.getBackground() == darker_gray || button.getBackground() == Color.GRAY) {
+                        if (button.getBackground() == darker_gray || button.getBackground() == Color.GRAY && currentTheme!=Theme.CUSTOM) {
                             button.setBorder(hoverBorder);
+                        }
+                        if(currentTheme == Theme.CUSTOM){
+                            button.setBorder(BorderFactory.createLineBorder(ButtonLightUpColor, 2));
                         }
                     }
 
                     public void mouseExited(java.awt.event.MouseEvent evt) {
                         // Revert border on mouse exit
-                        button.setBorder(originalBorder);
+                        if(currentTheme!=Theme.CUSTOM){
+                            button.setBorder(originalBorder);
+                        }else{
+                            button.setBorder(BorderFactory.createLineBorder(ButtonOutlineColor, 2));
+                        }
+
                     }
                 });
                 button.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseEntered(MouseEvent e) {
-                        button.setBorder(hoverBorder);
+                        if(currentTheme!=Theme.CUSTOM){
+                            button.setBorder(hoverBorder);
+                        }else{
+                            button.setBorder(BorderFactory.createLineBorder(ButtonLightUpColor, 2));
+                        }
+
                     }
                 });
 
@@ -140,7 +158,6 @@ public class Calculator {
         frame.setVisible(true);
         frame.addComponentListener(new ComponentAdapter() {
             public void componentResized(ComponentEvent e) { //makes changes if the window has been resized
-
                 textField.setPreferredSize(new Dimension(frame.getWidth(), frame.getHeight() / 5));
                 textField.setFont(new Font("Verdana", Font.PLAIN, (frame.getHeight() + frame.getWidth()) / 30));
                 double ratio = (double) frame.getSize().height / (double) frame.getWidth();
@@ -173,6 +190,28 @@ public class Calculator {
                 updateButtonColors();
             }
         });
+        CustomThemeItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Color Button = JColorChooser.showDialog(null, "Choose Button Color", Color.BLACK);
+                Color DarkerButton = JColorChooser.showDialog(null, "Choose Function Button Color", Color.BLACK);
+                Color ButtonOutline = JColorChooser.showDialog(null, "Choose Button Outline Color", Color.BLACK);
+                Color ButtonLightUp = JColorChooser.showDialog(null, "Choose Button On Hover Color", Color.BLACK);
+                Color ButtonText = JColorChooser.showDialog(null, "Choose Button Text Color", Color.BLACK);
+                Color Equals = JColorChooser.showDialog(null, "Choose Equals (=) Button Color", Color.BLACK);
+                Color Frame = JColorChooser.showDialog(null, "Choose Frame Color (Background)", Color.BLACK);
+
+                ButtonColor = Button;
+                DarkerButtonColor = DarkerButton;
+                ButtonOutlineColor = ButtonOutline;
+                ButtonLightUpColor = ButtonLightUp;
+                ButtonTextColor = ButtonText;
+                EqualsButtonColor = Equals;
+                FrameColor = Frame;
+                setTheme(Theme.CUSTOM);
+                updateButtonColors();
+            }
+        });
 
         darkThemeItem.addActionListener(new ActionListener() {
             @Override
@@ -186,19 +225,42 @@ public class Calculator {
     private void applyTheme() {
         switch (currentTheme) {
             case LIGHT:
+                for (Component component : buttonPanel.getComponents()) {
+                    if (component instanceof JButton) {
+                        JButton button = (JButton) component;
+                        button.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 2));
+                    }
+                }
                 frame.getContentPane().setBackground(lightBackgroundColor);
                 textField.setBackground(lightBackgroundColor);
                 textField.setForeground(lightForegroundColor);
-                buttonPanel.setBackground(Color.WHITE);
+                buttonPanel.setBackground(Color.DARK_GRAY);
 
 
                 break;
             case DARK:
+                for (Component component : buttonPanel.getComponents()) {
+                    if (component instanceof JButton) {
+                        JButton button = (JButton) component;
+                        button.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 2));
+                    }
+                }
                 frame.getContentPane().setBackground(darkBackgroundColor);
                 textField.setBackground(new Color(39, 39, 39));
                 textField.setForeground(darkForegroundColor);
                 buttonPanel.setBackground(Color.DARK_GRAY);
                 break;
+            case CUSTOM:
+                for (Component component : buttonPanel.getComponents()) {
+                    if (component instanceof JButton) {
+                        JButton button = (JButton) component;
+                        button.setBorder(BorderFactory.createLineBorder(ButtonOutlineColor, 2));
+                    }
+                }
+                frame.getContentPane().setBackground(Color.LIGHT_GRAY);
+                textField.setBackground(FrameColor);
+                textField.setForeground(ButtonTextColor);
+                buttonPanel.setBackground(FrameColor);
         }
     }
 
@@ -219,7 +281,24 @@ public class Calculator {
                     }
                 }
             }
-        } else {
+        } else if (currentTheme == Theme.CUSTOM) {
+            for (Component component : buttonPanel.getComponents()) {
+                if (component instanceof JButton) {
+                    JButton button = (JButton) component;
+                    if (Arrays.asList(darkerButtons).contains(button.getText())) {
+                        button.setBackground(DarkerButtonColor);
+                        button.setForeground(ButtonTextColor);
+                    } else if (button.getText() == "=") {
+                        button.setBackground(EqualsButtonColor);
+                        button.setForeground(ButtonTextColor);
+
+                    } else {
+                        button.setBackground(ButtonColor);
+                        button.setForeground(ButtonTextColor);
+                    }
+                }
+            }
+        }else{
             for (Component component : buttonPanel.getComponents()) {
                 if (component instanceof JButton) {
                     JButton button = (JButton) component;
